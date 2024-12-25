@@ -186,7 +186,9 @@
             const title = document.getElementById("heroTitle").value;
             const description = document.getElementById("heroDescription").value;
             const message = document.getElementById("whatsappMessage").value;
-            db.ref("settings/homePage").set({ title, description, message }).then(() => alert("تم تحديث الصفحة الرئيسية!"));
+            db.ref("settings/homePage").set({ title, description, message })
+                .then(() => alert("تم تحديث الصفحة الرئيسية!"))
+                .catch((error) => console.error("Error updating home page:", error));
         }
 
         // Add New Term
