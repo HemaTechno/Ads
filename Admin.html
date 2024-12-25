@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+        header {
+            background: #4a148c;
+            color: #fff;
+            padding: 1rem;
+            text-align: center;
+        }
+        .container {
+            padding: 2rem;
+        }
+        .form-section {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .form-section h2 {
+            margin-bottom: 1rem;
+            color: #4a148c;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .form-group button {
+            padding: 0.5rem 1rem;
+            background: #4a148c;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .form-group button:hover {
+            background: #6a1b9a;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>لوحة التحكم</h1>
+    </header>
+    <div class="container">
+        <!-- Section 1: Logo -->
+        <div class="form-section">
+            <h2>إعدادات الشعار</h2>
+            <div class="form-group">
+                <label for="logo">رابط الشعار:</label>
+                <input type="text" id="logo" placeholder="أدخل رابط الصورة">
+            </div>
+            <div class="form-group">
+                <button onclick="updateLogo()">حفظ الشعار</button>
+            </div>
+        </div>
+
+        <!-- Section 2: Colors -->
+        <div class="form-section">
+            <h2>إعدادات الألوان</h2>
+            <div class="form-group">
+                <label for="primaryColor">اللون الأساسي:</label>
+                <input type="color" id="primaryColor">
+            </div>
+            <div class="form-group">
+                <label for="secondaryColor">اللون الثانوي:</label>
+                <input type="color" id="secondaryColor">
+            </div>
+            <div class="form-group">
+                <button onclick="updateColors()">حفظ الألوان</button>
+            </div>
+        </div>
+
+        <!-- Section 3: Home Page Content -->
+        <div class="form-section">
+            <h2>إعدادات الصفحة الرئيسية</h2>
+            <div class="form-group">
+                <label for="heroTitle">عنوان الصفحة:</label>
+                <input type="text" id="heroTitle" placeholder="أدخل العنوان">
+            </div>
+            <div class="form-group">
+                <label for="heroDescription">وصف الصفحة:</label>
+                <textarea id="heroDescription" rows="4" placeholder="أدخل الوصف"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="whatsappMessage">رسالة الطلب للواتساب:</label>
+                <textarea id="whatsappMessage" rows="2" placeholder="أدخل الرسالة"></textarea>
+            </div>
+            <div class="form-group">
+                <button onclick="updateHomePage()">حفظ الصفحة</button>
+            </div>
+        </div>
+
+        <!-- Section 4: Terms -->
+        <div class="form-section">
+            <h2>شروط الخدمة</h2>
+            <div id="termsContainer">
+                <!-- يتم إضافة شروط جديدة هنا -->
+            </div>
+            <div class="form-group">
+                <button onclick="addNewTerm()">إضافة شرط جديد</button>
+            </div>
+        </div>
+
+        <!-- Section 5: Why Us -->
+        <div class="form-section">
+            <h2>لماذا نحن</h2>
+            <div id="whyUsContainer">
+                <!-- يتم إضافة "لماذا نحن" جديدة هنا -->
+            </div>
+            <div class="form-group">
+                <button onclick="addNewWhyUs()">إضافة سبب جديد</button>
+            </div>
+        </div>
+
+        <!-- Section 6: Footer -->
+        <div class="form-section">
+            <h2>إعدادات الفوتر</h2>
+            <div class="form-group">
+                <label for="footerAddress">العنوان:</label>
+                <input type="text" id="footerAddress" placeholder="أدخل العنوان">
+            </div>
+            <div class="form-group">
+                <label for="socialLinks">روابط السوشيال ميديا (افصلها بفاصلة):</label>
+                <textarea id="socialLinks" rows="3" placeholder="أدخل الروابط"></textarea>
+            </div>
+            <div class="form-group">
+                <button onclick="updateFooter()">حفظ الفوتر</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Initialization
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID",
+        };
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Update Logo
+        function updateLogo() {
+            const logo = document.getElementById("logo").value;
+            db.ref("settings/logo").set(logo).then(() => alert("تم تحديث الشعار!"));
+        }
+
+        // Update Colors
+        function updateColors() {
+            const primary = document.getElementById("primaryColor").value;
+            const secondary = document.getElementById("secondaryColor").value;
+            db.ref("settings/colors").set({ primary, secondary }).then(() => alert("تم تحديث الألوان!"));
+        }
+
+        // Update Home Page
+        function updateHomePage() {
+            const title = document.getElementById("heroTitle").value;
+            const description = document.getElementById("heroDescription").value;
+            const message = document.getElementById("whatsappMessage").value;
+            db.ref("settings/homePage").set({ title, description, message }).then(() => alert("تم تحديث الصفحة الرئيسية!"));
+        }
+
+        // Add New Term
+        function addNewTerm() {
+            const termText = prompt("أدخل نص الشرط:");
+            if (termText) {
+                const newTermRef = db.ref("settings/terms").push();
+                newTermRef.set({ text: termText }).then(() => alert("تم إضافة الشرط!"));
+            }
+        }
+
+        // Add New Why Us
+        function addNewWhyUs() {
+            const title = prompt("أدخل العنوان:");
+            const description = prompt("أدخل الوصف:");
+            const image = prompt("أدخل رابط الصورة:");
+            if (title && description && image) {
+                const newWhyUsRef = db.ref("settings/whyUs").push();
+                newWhyUsRef.set({ title, description, image }).then(() => alert("تمت الإضافة!"));
+            }
+        }
+
+        // Update Footer
+        function updateFooter() {
+            const address = document.getElementById("footerAddress").value;
+            const socialLinks = document.getElementById("socialLinks").value.split(",");
+            db.ref("settings/footer").set({ address, socialLinks }).then(() => alert("تم تحديث الفوتر!"));
+        }
+    </script>
+</body>
+</html>
