@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عرض المعلومات</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        header {
+            background-color: #4a148c;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+        .container {
+            padding: 2rem;
+        }
+        .hero {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .hero img {
+            max-width: 150px;
+            margin-bottom: 1rem;
+        }
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+        .hero button {
+            padding: 0.7rem 1.5rem;
+            background-color: #4a148c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .hero button:hover {
+            background-color: #6a1b9a;
+        }
+        .section {
+            margin-bottom: 2rem;
+        }
+        .section h2 {
+            margin-bottom: 1rem;
+            color: #4a148c;
+        }
+        .card {
+            padding: 1rem;
+            background: white;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+        }
+        .card img {
+            width: 50px;
+            height: 50px;
+            margin-right: 1rem;
+        }
+        .footer {
+            text-align: center;
+            padding: 1rem;
+            background: #4a148c;
+            color: white;
+        }
+        .footer a {
+            color: white;
+            margin: 0 0.5rem;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>موقع هيما تيك</h1>
+    </header>
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <img id="logo" alt="الشعار">
+            <h1 id="heroTitle"></h1>
+            <p id="heroDescription"></p>
+            <button id="whatsappButton">اطلب الآن</button>
+        </div>
+
+        <!-- Terms Section -->
+        <div class="section">
+            <h2>شروط الخدمة</h2>
+            <div id="termsContainer"></div>
+        </div>
+
+        <!-- Why Us Section -->
+        <div class="section">
+            <h2>لماذا نحن</h2>
+            <div id="whyUsContainer"></div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p id="footerAddress"></p>
+            <div id="socialLinks"></div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+    <script>
+        // Firebase Initialization
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID",
+        };
+        const app = firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Load Data from Firebase
+        function loadData() {
+            const logo = document.getElementById("logo");
+            const heroTitle = document.getElementById("heroTitle");
+            const heroDescription = document.getElementById("heroDescription");
+            const whatsappButton = document.getElementById("whatsappButton");
+            const termsContainer = document.getElementById("termsContainer");
+            const whyUsContainer = document.getElementById("whyUsContainer");
+            const footerAddress = document.getElementById("footerAddress");
+            const socialLinks = document.getElementById("socialLinks");
+
+            // Load Logo
+            db.ref("settings/logo").on("value", (snapshot) => {
+                logo.src = snapshot.val();
+            });
+
+            // Load Home Page Content
+            db.ref("settings/homePage").on("value", (snapshot) => {
+                const data = snapshot.val();
+                heroTitle.textContent = data.title;
+                heroDescription.textContent = data.description;
+                whatsappButton.onclick = () => {
+                    window.open(`https://wa.me/?text=${encodeURIComponent(data.message)}`, "_blank");
+                };
+            });
+
+            // Load Terms
+            db.ref("settings/terms").on("value", (snapshot) => {
+                termsContainer.innerHTML = "";
+                snapshot.forEach((term) => {
+                    const termCard = document.createElement("div");
+                    termCard.classList.add("card");
+                    termCard.innerHTML = `
+                        <img src="https://via.placeholder.com/50" alt="رقم">
+                        <span>${term.val().text}</span>
+                    `;
+                    termsContainer.appendChild(termCard);
+                });
+            });
+
+            // Load Why Us
+            db.ref("settings/whyUs").on("value", (snapshot) => {
+                whyUsContainer.innerHTML = "";
+                snapshot.forEach((reason) => {
+                    const reasonCard = document.createElement("div");
+                    reasonCard.classList.add("card");
+                    reasonCard.innerHTML = `
+                        <img src="${reason.val().image}" alt="سبب">
+                        <div>
+                            <h3>${reason.val().title}</h3>
+                            <p>${reason.val().description}</p>
+                        </div>
+                    `;
+                    whyUsContainer.appendChild(reasonCard);
+                });
+            });
+
+            // Load Footer
+            db.ref("settings/footer").on("value", (snapshot) => {
+                const data = snapshot.val();
+                footerAddress.textContent = data.address;
+                socialLinks.innerHTML = "";
+                data.socialLinks.forEach((link) => {
+                    const anchor = document.createElement("a");
+                    anchor.href = link;
+                    anchor.target = "_blank";
+                    anchor.textContent = link;
+                    socialLinks.appendChild(anchor);
+                });
+            });
+        }
+
+        loadData();
+    </script>
+</body>
+</html>
